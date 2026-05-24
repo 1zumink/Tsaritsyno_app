@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR-коды — Царицыно Квест</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: ui-rounded, system-ui, sans-serif;
+      background: #F2F2F2;
+      color: #262626;
+      padding: 32px 24px;
+    }
+    h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .subtitle { color: #666; margin-bottom: 8px; font-size: 15px; }
+    .base-url-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    }
+    .base-url-row label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .base-url-row input {
+      flex: 1;
+      border: 1.5px solid #ddd;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .base-url-row input:focus { border-color: #1E71B7; }
+    .btn-gen {
+      background: #FF0F74;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .card-icon { font-size: 40px; }
+    .card-name { font-size: 16px; font-weight: 700; text-align: center; }
+    .card-xp {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(0,166,81,.1);
+      color: #1F704D;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .card canvas { border-radius: 8px; }
+    .card-url {
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+    .btn-print {
+      background: #262626;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      margin-bottom: 24px;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .card { break-inside: avoid; box-shadow: none; border: 1px solid #eee; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🏰 QR-коды для Царицыно Квест</h1>
+  <p class="subtitle">Введите базовый URL вашего сайта и нажмите «Создать QR»</p>
+
+  <div class="base-url-row no-print">
+    <label>Адрес сайта:</label>
+    <input id="base-url" type="url" value="https://tsaritsyno-quest.ru/index.html" placeholder="https://ваш-сайт.ru/index.html">
+    <button class="btn-gen" onclick="generateAll()">Создать QR</button>
+  </div>
+
+  <button class="btn-print no-print" onclick="window.print()">🖨️ Распечатать все</button>
+
+  <div class="grid" id="grid"></div>
+
+  <script src="data.js"></script>
+  <script>
+    function generateAll() {
+      const base = document.getElementById('base-url').value.trim().replace(/\/$/, '');
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+
+      MONUMENTS.forEach(m => {
+        const url = `${base}?monument=${m.id}`;
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const canvas = document.createElement('canvas');
+        QRCode.toCanvas(canvas, url, { width: 160, margin: 2, color: { dark: '#262626', light: '#ffffff' } });
+
+        card.innerHTML = `
+          <div class="card-icon">${m.emoji}</div>
+          <div class="card-name">${m.name}</div>
+          <div class="card-xp">+${m.xp} XP</div>
+        `;
+        card.appendChild(canvas);
+        card.innerHTML += `<div class="card-url">${url}</div>`;
+        card.insertBefore(canvas, card.children[3]);
+        grid.appendChild(card);
+      });
+    }
+
+    generateAll();
+  </script>
+</body>
+</html>

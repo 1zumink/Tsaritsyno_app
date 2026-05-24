@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#262626">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Царицыно — Квест</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── ONBOARDING ─────────────────────────────────────────────────────────── -->
+<div id="screen-onboarding" class="screen">
+  <div class="onboarding-logo">🏰</div>
+  <div class="onboarding-title">Квест<br>«Царицыно»</div>
+  <div class="onboarding-sub">
+    Исследуй парк, сканируй QR-коды<br>
+    и собирай достопримечательности<br>
+    на свою карту!
+  </div>
+  <div class="onboarding-card">
+    <div class="onboarding-label">Как тебя зовут?</div>
+    <input
+      id="input-name"
+      class="onboarding-input"
+      type="text"
+      placeholder="Введи имя..."
+      maxlength="20"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+    >
+  </div>
+  <button id="btn-start" class="btn btn-primary">
+    Начать приключение →
+  </button>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ── MAP SCREEN ─────────────────────────────────────────────────────────── -->
+<div id="screen-map" class="screen hidden">
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-left">
+      <div class="hud-greeting">Привет,</div>
+      <div class="hud-name" id="hud-name"></div>
+    </div>
+    <div class="hud-right" id="hud-profile-btn" role="button" style="cursor:pointer">
+      <div class="hud-badge" id="hud-badge"></div>
+      <div class="hud-level-pill">
+        <span class="hud-level-emoji" id="hud-level-emoji"></span>
+        <div>
+          <div class="hud-xp-bar-wrap">
+            <div class="hud-xp-bar" id="hud-xp-bar" style="width:0%"></div>
+          </div>
+          <div class="hud-xp-text" id="hud-xp-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="map-container" id="map-container">
+    <div class="iso-world" id="iso-world">
+      <div class="iso-scene" id="iso-scene"></div>
+    </div>
+
+    <div class="map-hint">Нажми на объект, чтобы узнать о нём</div>
+  </div>
+
+</div>
+
+<!-- ── MONUMENT SCREEN ────────────────────────────────────────────────────── -->
+<div id="screen-monument" class="screen hidden">
+
+  <div id="mon-hero" class="mon-hero">
+    <img src="art.svg" class="mon-hero-ornament" aria-hidden="true">
+    <div class="mon-hero-badge">
+      <button id="btn-back-monument" class="btn btn-back-light">← Карта</button>
+    </div>
+    <div id="mon-hero-emoji" class="mon-hero-emoji">🏰</div>
+    <div id="mon-hero-name" class="mon-hero-name">Большой дворец</div>
+  </div>
+
+  <div class="mon-body">
+    <div>
+      <div class="mon-section-title">О месте</div>
+      <div id="mon-description" class="mon-description"></div>
+    </div>
+
+    <div class="mon-fact-card">
+      <div class="mon-fact-icon">💡</div>
+      <div id="mon-fact-text" class="mon-fact-text"></div>
+    </div>
+
+    <div class="mon-collect-wrap" id="mon-collect-wrap">
+      <button id="btn-collect" class="btn btn-collect" data-id="">
+        ⭐ Добавить на карту
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── PROFILE SCREEN ─────────────────────────────────────────────────────── -->
+<div id="screen-profile" class="screen hidden">
+
+  <div class="profile-hero">
+    <button id="btn-back-profile" class="btn btn-back-light" style="align-self:flex-start">← Назад</button>
+    <div class="profile-avatar">🧭</div>
+    <div class="profile-name" id="profile-name"></div>
+    <div class="profile-level-name" id="profile-level-name"></div>
+    <div class="profile-xp-section">
+      <div class="profile-xp-nums" id="profile-xp-nums"></div>
+      <div class="profile-xp-bar-wrap">
+        <div class="profile-xp-bar" id="profile-xp-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-body">
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-collected">0</div>
+        <div class="stat-label">Собрано</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">10</div>
+        <div class="stat-label">Всего мест</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-xp">0</div>
+        <div class="stat-label">Очки XP</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-level">1</div>
+        <div class="stat-label">Уровень</div>
+      </div>
+    </div>
+
+    <div class="mon-section-title" style="margin-bottom:12px">Моя коллекция</div>
+    <div class="collection-grid" id="collection-grid"></div>
+  </div>
+
+</div>
+
+<!-- ── BOTTOM SHEET ───────────────────────────────────────────────────────── -->
+<div id="bs-backdrop" style="
+  position:fixed; inset:0; z-index:19;
+  background:rgba(0,0,0,0); pointer-events:none;
+  transition: background .3s;
+" onclick="closeBottomSheet()"></div>
+<style>
+  #bs-backdrop.open { background:rgba(0,0,0,.5); pointer-events:all; }
+</style>
+
+<div id="bottom-sheet" class="bottom-sheet">
+  <div class="bs-handle"></div>
+  <div class="bs-header">
+    <div class="bs-icon" id="bs-icon" style="border-radius:14px; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:28px;">🏰</div>
+    <div>
+      <div class="bs-title" id="bs-title">Название</div>
+      <div class="bs-xp" id="bs-xp"></div>
+    </div>
+  </div>
+  <div class="bs-actions" id="bs-actions"></div>
+</div>
+
+
+<!-- ── SCANNER SCREEN ─────────────────────────────────────────────────────── -->
+<div id="screen-scanner" class="screen hidden">
+  <div class="scanner-header">
+    <button id="btn-back-scanner" class="btn btn-back-light">✕ Закрыть</button>
+    <div class="scanner-title">Сканируй QR-код</div>
+  </div>
+  <video id="scanner-video" playsinline autoplay muted></video>
+  <canvas id="scanner-canvas" hidden></canvas>
+  <div class="scanner-overlay">
+    <div class="scanner-frame">
+      <div class="scanner-line"></div>
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+  </div>
+  <div class="scanner-hint">Наведи камеру на QR-код у памятника</div>
+</div>
+
+<!-- ── FAB ───────────────────────────────────────────────────────────────── -->
+<button id="fab-scan" class="fab" style="display:none">
+  <span class="fab-icon">&#x1F4F7;</span>
+</button>
+
+<!-- ── LEVEL UP OVERLAY ───────────────────────────────────────────────────── -->
+<div id="levelup-overlay">
+  <div class="levelup-badge" id="lu-emoji">👑</div>
+  <div class="levelup-title" id="lu-title">Новый уровень!</div>
+  <div class="levelup-sub" id="lu-sub">Хозяин Царицыно</div>
+  <button class="btn btn-secondary" style="margin-top:8px">Продолжить</button>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────────────────────────── -->
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
